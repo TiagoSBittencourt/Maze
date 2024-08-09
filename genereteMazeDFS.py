@@ -1,8 +1,6 @@
 import pygame
 import random
 
-
-
 class Cell:
     def __init__(self, cordX, cordY) -> None:
         self.cordX, self.cordY = cordX, cordY
@@ -31,20 +29,20 @@ class Cell:
         if self.walls[3]:  # LEFT WALL
             pygame.draw.line(surface, pygame.Color("black"), (x, y + WALL), (x, y), width=2)
         
-    
 def caveMazeDFS(window, gridCells):
-    visitedList = [gridCells[0]]
-    gridCells[0].visited = True
-    gridCells[0].current = True
+    visited = set()
+    currentCell = gridCells[0]
+    currentCell.visited = True
+    currentCell.current = True
     stack = []
 
-    def findNeighbors(gridCells, currentCell):
+    def findNeighbors(currentCell):
         possibles = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         neighborsList = []
-        for (x, y) in possibles:
-            newX, newY = currentCell.cordX + x, currentCell.cordY + y
+        for (dx, dy) in possibles:
+            newX, newY = currentCell.cordX + dx, currentCell.cordY + dy
             if 0 <= newX < cols and 0 <= newY < rows:
-                neighbor = gridCells[newY * cols + newX] 
+                neighbor = gridCells[newY * cols + newX]
                 if not neighbor.visited:
                     neighborsList.append(neighbor)
         return neighborsList
@@ -65,11 +63,10 @@ def caveMazeDFS(window, gridCells):
         elif startCell.cordY - endCell.cordY == -1: # Moving Down
             startCell.walls[2] = 0  # BOTTOM wall
             endCell.walls[0] = 0  # TOP wall
-        
 
-    def DFS(gridCells, currentCell):
-        nonlocal stack
-        while len(stack) > 0 or currentCell:
+    def DFS():
+        nonlocal currentCell
+        while stack or currentCell:
             # Update display and pause
             for cell in gridCells:
                 cell.display(window)
@@ -77,25 +74,21 @@ def caveMazeDFS(window, gridCells):
             pygame.time.delay(100) 
 
             currentCell.current = False
-            neighbors = findNeighbors(gridCells, currentCell)
+            neighbors = findNeighbors(currentCell)
             if neighbors:
                 nextCell = random.choice(neighbors)
-                removeWalls(startCell=currentCell, endCell=nextCell)
+                removeWalls(currentCell, nextCell)
                 nextCell.current = True
                 nextCell.visited = True
+                visited.add(nextCell)
                 stack.append(currentCell)
                 currentCell = nextCell
-                visitedList.append(currentCell)
             elif stack:
                 currentCell = stack.pop()
             else:
                 break
 
-    DFS(gridCells, gridCells[0])
-
-        
-        
-
+    DFS()
 
 WIDTH, HEIGHT = 1200, 900
 RESOLUTION = (WIDTH, HEIGHT)
@@ -107,10 +100,7 @@ sc = pygame.display.set_mode(RESOLUTION)
 clock = pygame.time.Clock()
 
 # Create grid of cells
-gridCells = []
-for row in range(rows):
-    for col in range(cols):
-        gridCells.append(Cell(col, row))
+gridCells = [Cell(col, row) for row in range(rows) for col in range(cols)]
 
 caveMazeDFS(sc, gridCells)
 
@@ -121,11 +111,9 @@ while True:
 
     sc.fill(pygame.Color(40, 40, 40))
 
-
     # Display all cells
     for cell in gridCells:
         cell.display(sc)
-
 
     pygame.display.flip()
     clock.tick(60)
