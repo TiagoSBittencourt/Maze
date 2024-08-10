@@ -1,5 +1,6 @@
 import pygame
 import random
+from globals import WALL, WALLWIDTH, FPS, rows, cols
 
 class Cell:
     def __init__(self, cordX, cordY) -> None:
@@ -21,15 +22,14 @@ class Cell:
         
         # Draw walls
         if self.walls[0]:  # TOP WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x, y), (x + WALL, y), width=WALLWIDHT)
+            pygame.draw.line(surface, pygame.Color("black"), (x, y), (x + WALL, y), width=WALLWIDTH)
         if self.walls[1]:  # RIGHT WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x + WALL, y), (x + WALL, y + WALL), width=WALLWIDHT)
+            pygame.draw.line(surface, pygame.Color("black"), (x + WALL, y), (x + WALL, y + WALL), width=WALLWIDTH)
         if self.walls[2]:  # BOTTOM WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x + WALL, y + WALL), (x, y + WALL), width=WALLWIDHT)
+            pygame.draw.line(surface, pygame.Color("black"), (x + WALL, y + WALL), (x, y + WALL), width=WALLWIDTH)
         if self.walls[3]:  # LEFT WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x, y + WALL), (x, y), width=WALLWIDHT)
+            pygame.draw.line(surface, pygame.Color("black"), (x, y + WALL), (x, y), width=WALLWIDTH)
 
-        
 def caveMazeDFS(window, gridCells):
     visited = set()
     currentCell = gridCells[0]
@@ -69,6 +69,7 @@ def caveMazeDFS(window, gridCells):
         nonlocal currentCell
         while stack or currentCell:
             # Update display and pause
+            window.fill(pygame.Color(40, 40, 40))
             for cell in gridCells:
                 cell.display(window)
             for event in pygame.event.get():
@@ -95,31 +96,22 @@ def caveMazeDFS(window, gridCells):
 
     DFS()
 
-WIDTH, HEIGHT = 1200, 900
-RESOLUTION = (WIDTH, HEIGHT)
-WALL =  100
-WALLWIDHT = 3
-cols, rows = WIDTH // WALL, HEIGHT // WALL
+def mainMazeDFS(window, clock):
+    # Create grid of cells
+    gridCells = [Cell(col, row) for row in range(rows) for col in range(cols)]
 
-pygame.init()
-sc = pygame.display.set_mode(RESOLUTION)
-clock = pygame.time.Clock()
+    caveMazeDFS(window, gridCells)
 
-# Create grid of cells
-gridCells = [Cell(col, row) for row in range(rows) for col in range(cols)]
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
 
-caveMazeDFS(sc, gridCells)
+        window.fill(pygame.Color(40, 40, 40))
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            exit()
+        # Display all cells
+        for cell in gridCells:
+            cell.display(window)
 
-    sc.fill(pygame.Color(40, 40, 40))
-
-    # Display all cells
-    for cell in gridCells:
-        cell.display(sc)
-
-    pygame.display.flip()
-    clock.tick(60)
+        pygame.display.flip()
+        clock.tick(FPS)
