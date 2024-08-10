@@ -12,22 +12,23 @@ class Cell:
         x, y = self.cordX * WALL, self.cordY * WALL
         
         # Draw the cell background
-        if self.visited:
-            pygame.draw.rect(surface, pygame.Color(0, 50, 140), (x, y, WALL, WALL))
-        elif self.current:
+        if self.current:
             pygame.draw.rect(surface, pygame.Color(0, 0, 0), (x, y, WALL, WALL))
+        elif self.visited:
+            pygame.draw.rect(surface, pygame.Color(0, 50, 140), (x, y, WALL, WALL))
         else:
             pygame.draw.rect(surface, pygame.Color(0, 175, 255), (x, y, WALL, WALL))
         
         # Draw walls
         if self.walls[0]:  # TOP WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x, y), (x + WALL, y), width=2)
+            pygame.draw.line(surface, pygame.Color("black"), (x, y), (x + WALL, y), width=WALLWIDHT)
         if self.walls[1]:  # RIGHT WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x + WALL, y), (x + WALL, y + WALL), width=2)
+            pygame.draw.line(surface, pygame.Color("black"), (x + WALL, y), (x + WALL, y + WALL), width=WALLWIDHT)
         if self.walls[2]:  # BOTTOM WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x + WALL, y + WALL), (x, y + WALL), width=2)
+            pygame.draw.line(surface, pygame.Color("black"), (x + WALL, y + WALL), (x, y + WALL), width=WALLWIDHT)
         if self.walls[3]:  # LEFT WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x, y + WALL), (x, y), width=2)
+            pygame.draw.line(surface, pygame.Color("black"), (x, y + WALL), (x, y), width=WALLWIDHT)
+
         
 def caveMazeDFS(window, gridCells):
     visited = set()
@@ -70,6 +71,9 @@ def caveMazeDFS(window, gridCells):
             # Update display and pause
             for cell in gridCells:
                 cell.display(window)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
             pygame.display.flip()
             pygame.time.delay(100) 
 
@@ -85,6 +89,7 @@ def caveMazeDFS(window, gridCells):
                 currentCell = nextCell
             elif stack:
                 currentCell = stack.pop()
+                currentCell.current = True
             else:
                 break
 
@@ -92,7 +97,8 @@ def caveMazeDFS(window, gridCells):
 
 WIDTH, HEIGHT = 1200, 900
 RESOLUTION = (WIDTH, HEIGHT)
-WALL = 100
+WALL =  100
+WALLWIDHT = 3
 cols, rows = WIDTH // WALL, HEIGHT // WALL
 
 pygame.init()
