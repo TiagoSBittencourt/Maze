@@ -1,6 +1,9 @@
 import pygame
 import random
-from globals import WALL, WALLWIDTH, FPS, rows, cols
+import globals
+
+def get_grid_dimensions():
+    return globals.WIDTH // globals.WALLLEN, globals.HEIGHT // globals.WALLLEN
 
 class Cell:
     def __init__(self, cordX, cordY) -> None:
@@ -10,27 +13,29 @@ class Cell:
         self.current = False
 
     def display(self, surface):
-        x, y = self.cordX * WALL, self.cordY * WALL
+        x, y = self.cordX * globals.WALLLEN, self.cordY * globals.WALLLEN
         
         # Draw the cell background
         if self.current:
-            pygame.draw.rect(surface, pygame.Color(0, 0, 0), (x, y, WALL, WALL))
+            pygame.draw.rect(surface, pygame.Color(0, 0, 0), (x, y, globals.WALLLEN, globals.WALLLEN))
         elif self.visited:
-            pygame.draw.rect(surface, pygame.Color(0, 50, 140), (x, y, WALL, WALL))
+            pygame.draw.rect(surface, pygame.Color(0, 50, 140), (x, y, globals.WALLLEN, globals.WALLLEN))
         else:
-            pygame.draw.rect(surface, pygame.Color(0, 175, 255), (x, y, WALL, WALL))
+            pygame.draw.rect(surface, pygame.Color(0, 175, 255), (x, y, globals.WALLLEN, globals.WALLLEN))
         
         # Draw walls
         if self.walls[0]:  # TOP WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x, y), (x + WALL, y), width=WALLWIDTH)
+            pygame.draw.line(surface, pygame.Color("black"), (x, y), (x + globals.WALLLEN, y), width=globals.WALLWIDTH)
         if self.walls[1]:  # RIGHT WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x + WALL, y), (x + WALL, y + WALL), width=WALLWIDTH)
+            pygame.draw.line(surface, pygame.Color("black"), (x + globals.WALLLEN, y), (x + globals.WALLLEN, y + globals.WALLLEN), width=globals.WALLWIDTH)
         if self.walls[2]:  # BOTTOM WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x + WALL, y + WALL), (x, y + WALL), width=WALLWIDTH)
+            pygame.draw.line(surface, pygame.Color("black"), (x + globals.WALLLEN, y + globals.WALLLEN), (x, y + globals.WALLLEN), width=globals.WALLWIDTH)
         if self.walls[3]:  # LEFT WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x, y + WALL), (x, y), width=WALLWIDTH)
+            pygame.draw.line(surface, pygame.Color("black"), (x, y + globals.WALLLEN), (x, y), width=globals.WALLWIDTH)
 
 def caveMazeDFS(window, gridCells):
+    cols, rows = get_grid_dimensions()
+    
     visited = set()
     currentCell = gridCells[0]
     currentCell.visited = True
@@ -74,9 +79,10 @@ def caveMazeDFS(window, gridCells):
                 cell.display(window)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.quit()
                     exit()
             pygame.display.flip()
-            pygame.time.delay(100) 
+            pygame.time.delay(globals.CAVESPEED) 
 
             currentCell.current = False
             neighbors = findNeighbors(currentCell)
@@ -97,7 +103,10 @@ def caveMazeDFS(window, gridCells):
     DFS()
 
 def mainMazeDFS(window, clock):
+    print(f"\n\n MAIN MAZE\nWALL: {globals.WALLLEN},\n globals.WALLWIDTH: {globals.WALLWIDTH},\n globals.FPS: {globals.FPS},\n globals.CAVESPEED: {globals.CAVESPEED}")
+
     # Create grid of cells
+    cols, rows = get_grid_dimensions()
     gridCells = [Cell(col, row) for row in range(rows) for col in range(cols)]
 
     caveMazeDFS(window, gridCells)
@@ -105,6 +114,7 @@ def mainMazeDFS(window, clock):
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.quit()
                 exit()
 
         window.fill(pygame.Color(40, 40, 40))
@@ -114,4 +124,4 @@ def mainMazeDFS(window, clock):
             cell.display(window)
 
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(globals.FPS)
