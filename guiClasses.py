@@ -44,8 +44,8 @@ class Slider:
         self.dragging = False
         self.handle_radius = 10
         self.track_radius = 10
-        self.handle_color = "blue"
-        self.track_color = "white"
+        self.handle_color = "#0963DB"
+        self.track_color = "#A9A9A9"
         self.var_dict = var_dict  
         self.key = key
         self.step = step
@@ -59,7 +59,7 @@ class Slider:
         
         handle_rect = pygame.Rect(handle_x, handle_y, self.handle_radius * 2, self.handle_radius * 2)
         pygame.draw.ellipse(surface, self.handle_color, handle_rect)
-        pygame.draw.ellipse(surface, "white", handle_rect, 1)
+        pygame.draw.ellipse(surface, "#A9A9A9", handle_rect, 1)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -75,7 +75,7 @@ class Slider:
             self.value = round(self.value / self.step) * self.step 
             # Invert value if needed
             if self.invert:
-                self.var_dict[self.key] = int(self.max_val - self.value + 1)
+                self.var_dict[self.key] = int(self.max_val - self.value + 10)
             else:
                 self.var_dict[self.key] = int(self.value)
 
