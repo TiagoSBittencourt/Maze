@@ -17,6 +17,12 @@ pygame.mixer.music.set_volume(globals.VOLUME/100
 def getFontSize(size): 
     return pygame.font.Font("resources/Pixellari.ttf", size)
 
+def render_text_with_shadow(text, font_size, color, shadow_color, position):
+    text_shadow = getFontSize(font_size).render(text, True, shadow_color)
+    text_main = getFontSize(font_size).render(text, True, color)
+    SC.blit(text_shadow, (position[0] + 4, position[1] + 4))  # Offset shadow slightly
+    SC.blit(text_main, position)
+
 def main():
     def makeShadow(txt, fontSize, color, position):
         textShadow = getFontSize(fontSize).render(txt, True, color)
@@ -65,7 +71,7 @@ def main():
                     optionsMenu()
                     print(f"WALL: {globals.SIZE},\n globals.WALLWIDTH: {globals.WALLWIDTH},\n globals.FPS: {globals.FPS},\n globals.VOLUME: {globals.VOLUME},\n globals.CAVESPEED: {globals.CAVESPEED}")
                 if START_BUTTON.checkForClick(MENU_MOUSE_POS):
-                    mainMazeDFS(SC, CLOCK)
+                    choseMazeGenerationMenu()
                 if QUIT_BUTTON.checkForClick(MENU_MOUSE_POS):
                     pygame.quit()
                     exit()
@@ -85,36 +91,23 @@ def optionsMenu():
 
     BACK_BUTTON = Button(image=pygame.transform.scale(pygame.image.load("resources/BlueBackArrow.png"), (40, 40)), xCord=40, yCord=40)
 
-    size_length_slider = Slider(350, 100, 500, 10, 100, globals.SIZE, global_vars, 'globals.SIZE', step=1, invert=True)
+    size_length_text_dict = {1: "SMALL", 2: "MEDIUM", 3: "LARGE"}
+    size_resp_wall = {3: 35, 2: 65, 1: 100}
+
+
+    size_length_slider = Slider(350, 100, 500, 1, 3, 2, global_vars, 'globals.SIZE', step=1)
     wall_width_slider = Slider(350, 200, 500, 1, 9, globals.WALLWIDTH, global_vars, 'globals.WALLWIDTH', step=1)
     cave_speed_slider = Slider(350, 300, 500, 1, 5, globals.CAVESPEED, global_vars, 'globals.CAVESPEED', step=1, invert=True)  # Inverted
     fps_slider = Slider(350, 400, 500, 10, 120, globals.FPS, global_vars, 'globals.FPS', step=1)
     volume_slider = Slider(350, 500, 500, 0, 100, globals.VOLUME, global_vars, 'globals.VOLUME', step=1)
 
-    size_length_text = getFontSize(40).render("Maze Size", True, "#0963DB")
-    wall_width_text = getFontSize(40).render("Wall Width", True, "#0963DB")
-    cave_speed_text = getFontSize(40).render("Cave Speed", True, "#0963DB")
-    fps_text = getFontSize(40).render("FPS", True, "#0963DB")
-    volume_text = getFontSize(40).render("VOLUME", True, "#0963DB")
-    
-    size_length_text_shadow = getFontSize(40).render("Maze Size", True, "#000000")
-    wall_width_text_shadow = getFontSize(40).render("Wall Width", True, "#000000")
-    cave_speed_text_shadow = getFontSize(40).render("Cave Speed", True, "#000000")
-    fps_text_shadow = getFontSize(40).render("FPS", True, "#000000")
-    volume_text_shadow = getFontSize(40).render("VOLUME", True, "#000000")
-
-    SC.blit(size_length_text_shadow, (354, 64))
-    SC.blit(wall_width_text_shadow, (354, 164))
-    SC.blit(cave_speed_text_shadow, (354, 264))
-    SC.blit(fps_text_shadow, (354, 364))
-    SC.blit(volume_text_shadow, (354, 464))
-
-    SC.blit(size_length_text, (350, 60))
-    SC.blit(wall_width_text, (350, 160))
-    SC.blit(cave_speed_text, (350, 260))
-    SC.blit(fps_text, (350, 360))
-    SC.blit(volume_text, (350, 460))
-
+    labels = [
+        ("Maze Size", 40, (350, 60)),
+        ("Wall Width", 40, (350, 160)),
+        ("Cave Speed", 40, (350, 260)),
+        ("FPS", 40, (350, 360)),
+        ("VOLUME", 40, (350, 460))
+    ]
 
     while True:
         SC.fill(pygame.Color(40, 40, 40))
@@ -124,17 +117,9 @@ def optionsMenu():
         BACK_BUTTON.mouseOnButton(OPTIONS_MOUSE_POS)
         BACK_BUTTON.displayButton(SC)
 
-        SC.blit(size_length_text_shadow, (354, 64))
-        SC.blit(wall_width_text_shadow, (354, 164))
-        SC.blit(cave_speed_text_shadow, (354, 264))
-        SC.blit(fps_text_shadow, (354, 364))
-        SC.blit(volume_text_shadow, (354, 464))
-
-        SC.blit(size_length_text, (350, 60))
-        SC.blit(wall_width_text, (350, 160))
-        SC.blit(cave_speed_text, (350, 260))
-        SC.blit(fps_text, (350, 360))
-        SC.blit(volume_text, (350, 460))
+        # Render all labels with shadows
+        for label, font_size, pos in labels:
+            render_text_with_shadow(label, font_size, "#0963DB", "#000000", pos)
 
         # Draw sliders
         size_length_slider.draw(SC)
@@ -143,38 +128,17 @@ def optionsMenu():
         fps_slider.draw(SC)
         volume_slider.draw(SC)
 
-        # Update and draw value texts
-        size_length_value_text = getFontSize(45).render(str(size_length_slider.getValue()), True, "#0963DB")
-        wall_width_value_text = getFontSize(45).render(str(wall_width_slider.getValue()), True, "#0963DB")
-        cave_speed_value_text = getFontSize(45).render(str(cave_speed_slider.getValue()), True, "#0963DB")
-        fps_value_text = getFontSize(45).render(str(fps_slider.getValue()), True, "#0963DB")
-        volume_value_text = getFontSize(45).render(str(volume_slider.getValue()), True, "#0963DB")
+        # Value Text with Shadow and Main Text
+        values = [
+            (str(size_length_text_dict[size_length_slider.getValue()]), 40, (350 + 500 // 2, 120)),
+            (str(wall_width_slider.getValue()), 45, (350 + 500 // 2, 220)),
+            (str(cave_speed_slider.getValue()), 45, (350 + 500 // 2, 320)),
+            (str(fps_slider.getValue()), 45, (350 + 500 // 2, 420)),
+            (str(volume_slider.getValue()), 45, (350 + 500 // 2, 520))
+        ]
 
-        # Title Shadow
-        size_length_value_text = getFontSize(45).render(str(size_length_slider.getValue()), True, "#000000")
-        wall_width_value_text = getFontSize(45).render(str(wall_width_slider.getValue()), True, "#000000")
-        cave_speed_value_text = getFontSize(45).render(str(cave_speed_slider.getValue()), True, "#000000")
-        fps_value_text = getFontSize(45).render(str(fps_slider.getValue()), True, "#000000")
-        volume_value_text = getFontSize(45).render(str(volume_slider.getValue()), True, "#000000")
-
-        SC.blit(size_length_value_text, (350 + 500 // 2 - size_length_value_text.get_width() // 2 + 4, 124))
-        SC.blit(wall_width_value_text, (350 + 500 // 2 - wall_width_value_text.get_width() // 2 + 4, 224))
-        SC.blit(cave_speed_value_text, (350 + 500 // 2 - cave_speed_value_text.get_width() // 2 + 4, 324))
-        SC.blit(fps_value_text, (350 + 500 // 2 - fps_value_text.get_width() // 2 + 4, 424))
-        SC.blit(volume_value_text, (350 + 500 // 2 - volume_value_text.get_width() // 2 + 4, 524))
-        
-        # Title 
-        size_length_value_text = getFontSize(45).render(str(size_length_slider.getValue()), True, "#0963DB")
-        wall_width_value_text = getFontSize(45).render(str(wall_width_slider.getValue()), True, "#0963DB")
-        cave_speed_value_text = getFontSize(45).render(str(cave_speed_slider.getValue()), True, "#0963DB")
-        fps_value_text = getFontSize(45).render(str(fps_slider.getValue()), True, "#0963DB")
-        volume_value_text = getFontSize(45).render(str(volume_slider.getValue()), True, "#0963DB")
-
-        SC.blit(size_length_value_text, (350 + 500 // 2 - size_length_value_text.get_width() // 2, 120))
-        SC.blit(wall_width_value_text, (350 + 500 // 2 - wall_width_value_text.get_width() // 2, 220))
-        SC.blit(cave_speed_value_text, (350 + 500 // 2 - cave_speed_value_text.get_width() // 2, 320))
-        SC.blit(fps_value_text, (350 + 500 // 2 - fps_value_text.get_width() // 2, 420))
-        SC.blit(volume_value_text, (350 + 500 // 2 - volume_value_text.get_width() // 2, 520))
+        for value, font_size, pos in values:
+            render_text_with_shadow(value, font_size, "#0963DB", "#000000", (pos[0] - getFontSize(font_size).render(value, True, "#0963DB").get_width() // 2, pos[1]))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -182,7 +146,8 @@ def optionsMenu():
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if BACK_BUTTON.checkForClick(OPTIONS_MOUSE_POS):
-                    globals.SIZE = global_vars["globals.SIZE"]
+                    # Not the best implementetion of size
+                    globals.SIZE = size_resp_wall.get(global_vars.get("globals.SIZE", 2), 50)
                     globals.WALLWIDTH = global_vars["globals.WALLWIDTH"]
                     globals.FPS = global_vars["globals.FPS"]
                     globals.VOLUME = global_vars["globals.VOLUME"]
@@ -207,7 +172,57 @@ def optionsMenu():
                 fps_slider.handle_event(event)
                 volume_slider.handle_event(event)
                 # Update the music volume
-                pygame.mixer.music.set_volume(volume_slider.getValue()/100)
+                pygame.mixer.music.set_volume(volume_slider.getValue() / 100)
+
+        pygame.display.flip()
+        CLOCK.tick(globals.FPS)
+
+
+def choseMazeGenerationMenu():
+    SC.fill(pygame.Color(40, 40, 40))
+    SC.blit(BG, (0, 0))
+
+    # Button positions
+    button_positions = [
+        (globals.WIDTH // 4, 200),
+        (globals.WIDTH // 4, 400),
+        (globals.WIDTH // 4, 600),
+        (globals.WIDTH // 4, 800),
+        (globals.WIDTH * 3 // 4, 200),
+        (globals.WIDTH * 3 // 4, 400),
+        (globals.WIDTH * 3 // 4, 600),
+        (globals.WIDTH * 3 // 4, 800)
+    ]
+
+    # Creating buttons
+    buttons = []
+    button_texts = ["DFS", "Prim's", "Eller's", "Hunt-Kill", "Binarry Tree", "Kruskal's", "Sizewinder", "Bronder"]
+    
+    for i, pos in enumerate(button_positions):
+        buttons.append(Button(image=pygame.image.load("resources/MenuButtonRect.png"), xCord=pos[0], yCord=pos[1],
+                              text=button_texts[i], font=getFontSize(60), baseColor="#d7fcd4", hoveringColor="#0963DB"))
+    
+    while True:
+        SC.fill(pygame.Color(40, 40, 40))
+        SC.blit(BG, (0, 0))
+
+        MAZE_MOUSE_POS = pygame.mouse.get_pos()
+
+        # Draw all buttons
+        for button in buttons:
+            button.mouseOnButton(MAZE_MOUSE_POS)
+            button.displayButton(SC)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for i, button in enumerate(buttons):
+                    if button.checkForClick(MAZE_MOUSE_POS):
+                        if i == 0:
+                            mainMazeDFS(SC, CLOCK)
+
 
         pygame.display.flip()
         CLOCK.tick(globals.FPS)

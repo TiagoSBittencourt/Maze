@@ -9,6 +9,7 @@ class Cell:
     def __init__(self, cordX, cordY) -> None:
         self.cordX, self.cordY = cordX, cordY
         self.walls = [1, 1, 1, 1]
+        self.complete = False
         self.visited = False
         self.current = False
 
@@ -17,11 +18,14 @@ class Cell:
         
         # Draw the cell background
         if self.current:
-            pygame.draw.rect(surface, pygame.Color(0, 0, 0), (x, y, globals.SIZE, globals.SIZE))
+            pygame.draw.rect(surface, pygame.Color(255, 255, 255), (x, y, globals.SIZE, globals.SIZE))
         elif self.visited:
-            pygame.draw.rect(surface, pygame.Color(0, 50, 140), (x, y, globals.SIZE, globals.SIZE))
+            if self.complete:
+                pygame.draw.rect(surface, pygame.Color(0, 50, 140), (x, y, globals.SIZE, globals.SIZE))
+            else:
+                pygame.draw.rect(surface, pygame.Color(0, 175, 255), (x, y, globals.SIZE, globals.SIZE))
         else:
-            pygame.draw.rect(surface, pygame.Color(0, 175, 255), (x, y, globals.SIZE, globals.SIZE))
+            pygame.draw.rect(surface, pygame.Color(50, 50, 50), (x, y, globals.SIZE, globals.SIZE))
         
         # Draw walls
         if self.walls[0]:  # TOP WALL
@@ -103,9 +107,12 @@ def caveMazeDFS(window, gridCells):
                 stack.append(currentCell)
                 currentCell = nextCell
             elif stack:
+                currentCell.complete = True
                 currentCell = stack.pop()
                 currentCell.current = True
             else:
+                currentCell.complete = True
+                currentCell.current = False
                 break
 
     DFS()

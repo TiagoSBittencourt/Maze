@@ -75,7 +75,7 @@ class Slider:
             self.value = round(self.value / self.step) * self.step 
             # Invert value if needed
             if self.invert:
-                self.var_dict[self.key] = int(self.max_val - self.value + 10)
+                self.var_dict[self.key] = int(self.max_val - self.value + 1)
             else:
                 self.var_dict[self.key] = int(self.value)
 
