@@ -2,6 +2,7 @@ import pygame
 from pygame import mixer
 import globals
 from genereteMazeDFS import mainMazeDFS
+from genereteMazePrins import mainMazePrins
 from guiClasses import Button, Slider
 
 pygame.init()
@@ -12,8 +13,8 @@ BG = pygame.image.load("resources/BG image.png")
 BG = pygame.transform.scale(BG, globals.RESOLUTION)
 mixer.music.load("resources/MenuMusic.mp3")
 mixer.music.play(-1)
-pygame.mixer.music.set_volume(globals.VOLUME/100
-                              )
+pygame.mixer.music.set_volume(globals.VOLUME/100)
+
 def getFontSize(size): 
     return pygame.font.Font("resources/Pixellari.ttf", size)
 
@@ -222,6 +223,8 @@ def choseMazeGenerationMenu():
                     if button.checkForClick(MAZE_MOUSE_POS):
                         if i == 0:
                             mainMazeDFS(SC, CLOCK)
+                        elif i == 1:
+                            mainMazePrins(SC, CLOCK)
 
 
         pygame.display.flip()
