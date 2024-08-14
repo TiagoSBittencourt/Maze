@@ -1,41 +1,10 @@
 import pygame
 import random
 import globals
+from cellClass import Cell
 
 def get_grid_dimensions():
     return globals.WIDTH // globals.SIZE, globals.HEIGHT // globals.SIZE
-
-class Cell:
-    def __init__(self, cordX, cordY) -> None:
-        self.cordX, self.cordY = cordX, cordY
-        self.walls = [1, 1, 1, 1]
-        self.complete = False
-        self.visited = False
-        self.current = False
-
-    def display(self, surface):
-        x, y = self.cordX * globals.SIZE, self.cordY * globals.SIZE
-        
-        # Draw the cell background
-        if self.current:
-            pygame.draw.rect(surface, pygame.Color(255, 255, 255), (x, y, globals.SIZE, globals.SIZE))
-        elif self.visited:
-            if self.complete:
-                pygame.draw.rect(surface, pygame.Color(0, 50, 140), (x, y, globals.SIZE, globals.SIZE))
-            else:
-                pygame.draw.rect(surface, pygame.Color(0, 175, 255), (x, y, globals.SIZE, globals.SIZE))
-        else:
-            pygame.draw.rect(surface, pygame.Color(50, 50, 50), (x, y, globals.SIZE, globals.SIZE))
-        
-        # Draw walls
-        if self.walls[0]:  # TOP WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x, y), (x + globals.SIZE, y), width=globals.WALLWIDTH)
-        if self.walls[1]:  # RIGHT WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x + globals.SIZE, y), (x + globals.SIZE, y + globals.SIZE), width=globals.WALLWIDTH)
-        if self.walls[2]:  # BOTTOM WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x + globals.SIZE, y + globals.SIZE), (x, y + globals.SIZE), width=globals.WALLWIDTH)
-        if self.walls[3]:  # LEFT WALL
-            pygame.draw.line(surface, pygame.Color("black"), (x, y + globals.SIZE), (x, y), width=globals.WALLWIDTH)
 
 def caveMazeDFS(window, gridCells):
     cols, rows = get_grid_dimensions()
@@ -122,7 +91,7 @@ def mainMazeDFS(window, clock):
 
     # Create grid of cells
     cols, rows = get_grid_dimensions()
-    gridCells = [Cell(col, row) for row in range(rows) for col in range(cols)]
+    gridCells = [Cell(col, row, (255, 255, 255), (0, 50, 140), (0, 175, 255)) for row in range(rows) for col in range(cols)]
 
     caveMazeDFS(window, gridCells)
 
