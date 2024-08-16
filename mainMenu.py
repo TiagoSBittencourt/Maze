@@ -37,20 +37,20 @@ def main():
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 
         MENU_TEXT = getFontSize(100).render("MAIN MENU", True, "#0963DB")
-        MENU_RECT = MENU_TEXT.get_rect(center=(globals.WIDTH//2, 200))
-        MENU_TEXT_SHADOW, MENU_RECT_SHADOW = makeShadow("MAIN MENU", 100, "#000000", ((globals.WIDTH+8)//2, 208))
+        MENU_RECT = MENU_TEXT.get_rect(center=(globals.WIDTH//2, globals.HEIGHT*1/5))
+        MENU_TEXT_SHADOW, MENU_RECT_SHADOW = makeShadow("MAIN MENU", 100, "#000000", ((globals.WIDTH+8)//2, globals.HEIGHT*1/5 + 8))
 
-        START_BUTTON = Button(image=pygame.image.load("resources/MenuButtonRect.png"), xCord=globals.WIDTH//2, yCord=350, 
+        START_BUTTON = Button(image=pygame.image.load("resources/MenuButtonRect.png"), xCord=globals.WIDTH//2, yCord=globals.HEIGHT*2/5, 
                             text="START", font=getFontSize(75), baseColor="#d7fcd4", hoveringColor="#0963DB")
-        START_TEXT_SHADOW, START_RECT_SHADOW = makeShadow("START", 75, "#000000", ((globals.WIDTH+8)//2, 358))
+        START_TEXT_SHADOW, START_RECT_SHADOW = makeShadow("START", 75, "#000000", ((globals.WIDTH+8)//2, globals.HEIGHT*2/5 + 8))
 
-        OPTIONS_BUTTON = Button(image=pygame.image.load("resources/MenuButtonRect.png"), xCord=globals.WIDTH//2, yCord=500, 
+        OPTIONS_BUTTON = Button(image=pygame.image.load("resources/MenuButtonRect.png"), xCord=globals.WIDTH//2, yCord=globals.HEIGHT*3/5, 
                             text="OPTIONS", font=getFontSize(75), baseColor="#d7fcd4", hoveringColor="#0963DB")
-        OPTIONS_TEXT_SHADOW, OPTIONS_RECT_SHADOW = makeShadow("OPTIONS", 75, "#000000", ((globals.WIDTH+8)//2, 508))
+        OPTIONS_TEXT_SHADOW, OPTIONS_RECT_SHADOW = makeShadow("OPTIONS", 75, "#000000", ((globals.WIDTH+8)//2, globals.HEIGHT*3/5 + 8))
 
-        QUIT_BUTTON = Button(image=pygame.image.load("resources/MenuButtonRect.png"), xCord=globals.WIDTH//2, yCord=650, 
+        QUIT_BUTTON = Button(image=pygame.image.load("resources/MenuButtonRect.png"), xCord=globals.WIDTH//2, yCord=globals.HEIGHT*4/5, 
                             text="QUIT", font=getFontSize(75), baseColor="#d7fcd4", hoveringColor="#0963DB")
-        QUIT_TEXT_SHADOW, QUIT_RECT_SHADOW = makeShadow("QUIT", 75, "#000000", ((globals.WIDTH+8)//2, 658))
+        QUIT_TEXT_SHADOW, QUIT_RECT_SHADOW = makeShadow("QUIT", 75, "#000000", ((globals.WIDTH+8)//2, globals.HEIGHT*4/5 + 8))
 
 
         for textShadow, rectShadow in [(MENU_TEXT_SHADOW, MENU_RECT_SHADOW), (START_TEXT_SHADOW, START_RECT_SHADOW), (OPTIONS_TEXT_SHADOW, OPTIONS_RECT_SHADOW), (QUIT_TEXT_SHADOW, QUIT_RECT_SHADOW)]:
