@@ -13,6 +13,7 @@ class Cell:
         self.complete = False
         self.visited = False
         self.current = False
+        self.setID = None  # Add setID attribute for the Eller's algorithm
 
     def display(self, surface):
         x, y = self.cordX * globals.SIZE, self.cordY * globals.SIZE

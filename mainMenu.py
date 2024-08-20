@@ -1,9 +1,14 @@
 import pygame
 from pygame import mixer
 import globals
-from genereteMazeDFS import mainMazeDFS
-from genereteMazePrins import mainMazePrins
+from generateMazeDFS import mainMazeDFS
+from generateMazePrins import mainMazePrins
+from generateMazeEllers import mainMazeEllers
 from guiClasses import Button, Slider
+
+"""
+                                                TODO: Bug fix on Maze Generation of Ellers
+"""
 
 pygame.init()
 pygame.mixer.init()
@@ -225,6 +230,8 @@ def choseMazeGenerationMenu():
                             mainMazeDFS(SC, CLOCK)
                         elif i == 1:
                             mainMazePrins(SC, CLOCK)
+                        elif i == 2:
+                            mainMazeEllers(SC, CLOCK)
 
 
         pygame.display.flip()
